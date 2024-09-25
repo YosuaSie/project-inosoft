@@ -61,8 +61,14 @@
         </div>
 
         <br><br>
+        <!-- Loading Indicator -->
+        <div v-if="isLoading" class="loading-indicator">
+          <div class="loading-spinner"></div>
+          <h3>Loading data...</h3>
+        </div>
+
         <!-- Tabel untuk menampilkan data yang difilter -->
-        <table class="table table-striped table-hover">
+        <table v-if="showTable" class="table table-striped table-hover">
           <thead>
             <tr>
               <th>#</th>
@@ -131,6 +137,12 @@
 
         //variabel untuk simpan data yang mau dicari
         findProducts: [],
+
+        //boolean untuk tampilkan loading animation
+        isLoading: false,
+
+        //boolean untuk tampilkan table
+        showTable: false,
       };
     },
     methods: {
@@ -295,18 +307,24 @@
   
       // Aksi pencarian
       search() {
-        
-        //munculkan data table
-        this.findProducts = this.products.filter(product => {
-          return (
-            (!this.selectedProduct || product.type === this.selectedProduct) && 
-            (!this.selectedGrade || product.grade === this.selectedGrade) && 
-            (!this.selectedSize || product.size === this.selectedSize) && 
-            (!this.selectedConnection || product.connection === this.selectedConnection)
-          );
-        });
-        // console.log('Filtered Products (as JSON):', JSON.stringify(this.filtered, null, 2));
+        this.showTable = true; //tampilkan table
+        this.isLoading = true; //mulai proses loading
 
+        //munculkan data table
+        setTimeout(() => {
+          this.findProducts = this.products.filter(product => {
+            return (
+              (!this.selectedProduct || product.type === this.selectedProduct) && 
+              (!this.selectedGrade || product.grade === this.selectedGrade) && 
+              (!this.selectedSize || product.size === this.selectedSize) && 
+              (!this.selectedConnection || product.connection === this.selectedConnection)
+            );
+          });
+
+          this.isLoading = false;
+        }, 1000);
+        
+        // console.log('Filtered Products (as JSON):', JSON.stringify(this.filtered, null, 2));
       },
       reset() {
         //kosongkan semua
@@ -340,14 +358,6 @@
 </script>
   
 <style scoped>
-  .search-container {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    background-color: #f9f9f9;
-  }
   
   .form-group {
     margin-bottom: 15px;
@@ -355,6 +365,22 @@
   
   label {
     font-weight: bold;
+  }
+
+  .loading-indicator {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+
+  .loading-spinner {
+    border: 16px solid #f3f3f3; /* Light grey */
+    border-top: 16px solid #3498db; /* Blue */
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    animation: spin 2s linear infinite;
   }
 </style>
   
